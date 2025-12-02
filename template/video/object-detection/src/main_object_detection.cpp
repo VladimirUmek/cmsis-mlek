@@ -38,32 +38,25 @@
 #include "main.h"
 #include "log_macros.h"      /* Logging macros (optional) */
 
-namespace arm {
-namespace app {
-    /* Tensor arena buffer */
-    static uint8_t tensorArena[ACTIVATION_BUF_SZ] ACTIVATION_BUF_ATTRIBUTE;
+using namespace arm::app;
 
-    /* Optional getter function for the model pointer and its size. */
-    namespace object_detection {
-        extern uint8_t* GetModelPointer();
-        extern size_t GetModelLen();
-    } /* namespace object_detection */
-} /* namespace app */
-} /* namespace arm */
+/* Tensor arena buffer */
+static uint8_t tensorArena[ACTIVATION_BUF_SZ] ACTIVATION_BUF_ATTRIBUTE;
+
+/* Optional getter function for the model pointer and its size. */
+namespace arm::app::object_detection {
+    extern uint8_t* GetModelPointer();
+    extern size_t GetModelLen();
+}
 
 void app_main_thread(void *arg)
 {
     /* Model object creation and initialisation. */
-    arm::app::YoloFastestModel model;
-    if (!model.Init(arm::app::tensorArena,
-                    sizeof(arm::app::tensorArena),
-                    arm::app::object_detection::GetModelPointer(),
-                    arm::app::object_detection::GetModelLen())) {
+    YoloFastestModel model;
+    if (!model.Init(tensorArena, sizeof(tensorArena), object_detection::GetModelPointer(), object_detection::GetModelLen())) {
         printf_err("Failed to initialise model\n");
         return;
     }
-
-    auto initialImgIdx = 0;
 
     TfLiteTensor* inputTensor   = model.GetInputTensor(0);
     TfLiteTensor* outputTensor0 = model.GetOutputTensor(0);
@@ -77,31 +70,28 @@ void app_main_thread(void *arg)
         return;
     }
 
+    /* Get input shape dimensions */
     TfLiteIntArray* inputShape = model.GetInputShape(0);
+    const int inputImgCols = inputShape->data[YoloFastestModel::ms_inputColsIdx];
+    const int inputImgRows = inputShape->data[YoloFastestModel::ms_inputRowsIdx];
 
-    const int inputImgCols = inputShape->data[arm::app::YoloFastestModel::ms_inputColsIdx];
-    const int inputImgRows = inputShape->data[arm::app::YoloFastestModel::ms_inputRowsIdx];
+    /* Object to hold detection results */
+    std::vector<object_detection::DetectionResult> results;
 
     /* Set up pre and post-processing. */
-    arm::app::DetectorPreProcess preProcess =
-        arm::app::DetectorPreProcess(inputTensor, true, model.IsDataSigned());
+    DetectorPreProcess preProcess = DetectorPreProcess(inputTensor, true, model.IsDataSigned());
 
-    std::vector<arm::app::object_detection::DetectionResult> results;
-    const arm::app::object_detection::PostProcessParams postProcessParams{
+    const object_detection::PostProcessParams postProcessParams{
         inputImgRows,
         inputImgCols,
-        arm::app::object_detection::originalImageSize,
-        arm::app::object_detection::anchor1,
-        arm::app::object_detection::anchor2};
-    arm::app::DetectorPostProcess postProcess =
-        arm::app::DetectorPostProcess(outputTensor0, outputTensor1, results, postProcessParams);
+        object_detection::originalImageSize,
+        object_detection::anchor1,
+        object_detection::anchor2};
 
-    auto dstPtr = static_cast<uint8_t*>(inputTensor->data.uint8);
+    DetectorPostProcess postProcess = DetectorPostProcess(outputTensor0, outputTensor1, results, postProcessParams);
 
     uint32_t img_idx = 0;
     size_t img_sz;
-
-    void *rgbFrame;
     const uint8_t *img_buf;
 
     while (open_img_source(img_idx)) {

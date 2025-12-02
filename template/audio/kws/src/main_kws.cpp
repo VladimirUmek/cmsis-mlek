@@ -44,43 +44,39 @@
 #include "main.h"
 #include "log_macros.h"      /* Logging macros (optional) */
 
-namespace arm {
-namespace app {
-    /* Tensor arena buffer */
-    static uint8_t tensorArena[ACTIVATION_BUF_SZ] ACTIVATION_BUF_ATTRIBUTE;
+using namespace arm::app;
 
-    /* Optional getter function for the model pointer and its size. */
-    namespace kws {
-        extern uint8_t* GetModelPointer();
-        extern size_t GetModelLen();
-    } /* namespace kws */
-} /* namespace app */
-} /* namespace arm */
+/* Tensor arena buffer */
+static uint8_t tensorArena[ACTIVATION_BUF_SZ] ACTIVATION_BUF_ATTRIBUTE;
+
+/* Optional getter function for the model pointer and its size. */
+namespace arm::app::kws {
+    extern uint8_t* GetModelPointer();
+    extern size_t GetModelLen();
+}
 
 void app_main_thread(void *arg)
 {
     /* Model object creation and initialisation. */
-    arm::app::MicroNetKwsModel model;
-    if (!model.Init(arm::app::tensorArena,
-                    sizeof(arm::app::tensorArena),
-                    arm::app::kws::GetModelPointer(),
-                    arm::app::kws::GetModelLen())) {
+    MicroNetKwsModel model;
+    if (!model.Init(tensorArena, sizeof(tensorArena), kws::GetModelPointer(), kws::GetModelLen())) {
         printf_err("Failed to initialise model\n");
         return;
     }
 
     constexpr int minTensorDims = static_cast<int>(
-        (arm::app::MicroNetKwsModel::ms_inputRowsIdx > arm::app::MicroNetKwsModel::ms_inputColsIdx)
-            ? arm::app::MicroNetKwsModel::ms_inputRowsIdx
-            : arm::app::MicroNetKwsModel::ms_inputColsIdx);
+        (MicroNetKwsModel::ms_inputRowsIdx > MicroNetKwsModel::ms_inputColsIdx)
+            ? MicroNetKwsModel::ms_inputRowsIdx
+            : MicroNetKwsModel::ms_inputColsIdx);
 
-    const auto mfccFrameLength = 640;
-    const auto mfccFrameStride = 320;
-    const auto scoreThreshold  = 0.7;
+    constexpr auto mfccFrameLength = 640;
+    constexpr auto mfccFrameStride = 320;
+    constexpr auto scoreThreshold = 0.7f;
 
     /* Get Input and Output tensors for pre/post processing. */
     TfLiteTensor* inputTensor  = model.GetInputTensor(0);
     TfLiteTensor* outputTensor = model.GetOutputTensor(0);
+
     if (!inputTensor->dims) {
         printf_err("Invalid input tensor dims\n");
         return;
@@ -91,48 +87,45 @@ void app_main_thread(void *arg)
 
     /* Get input shape for feature extraction. */
     TfLiteIntArray* inputShape     = model.GetInputShape(0);
-    const uint32_t numMfccFeatures = inputShape->data[arm::app::MicroNetKwsModel::ms_inputColsIdx];
-    const uint32_t numMfccFrames   = inputShape->data[arm::app::MicroNetKwsModel::ms_inputRowsIdx];
+    const uint32_t numMfccFeatures = inputShape->data[MicroNetKwsModel::ms_inputColsIdx];
+    const uint32_t numMfccFrames   = inputShape->data[MicroNetKwsModel::ms_inputRowsIdx];
 
     /* We expect to be sampling 1 second worth of data at a time.
      * NOTE: This is only used for time stamp calculation. */
-    const float secondsPerSample = 1.0 / arm::app::audio::MicroNetKwsMFCC::ms_defaultSamplingFreq;
+    const float secondsPerSample = 1.0 / audio::MicroNetKwsMFCC::ms_defaultSamplingFreq;
 
     /* Classifier object for results */
-    arm::app::KwsClassifier classifier;
+    KwsClassifier classifier;
 
     /* Object to hold label strings. */
     std::vector<std::string> labels;
 
     /* Declare a container to hold results from across the whole audio clip. */
-    std::vector<arm::app::kws::KwsResult> finalResults;
+    std::vector<kws::KwsResult> finalResults;
 
     /* Object to hold classification results */
-    std::vector<arm::app::ClassificationResult> singleInfResult;
+    std::vector<ClassificationResult> singleInfResult;
 
     /* Populate the labels here. */
     GetLabelsVector(labels);
 
     /* Set up pre and post-processing. */
-    arm::app::KwsPreProcess preProcess = arm::app::KwsPreProcess(
-        inputTensor, numMfccFeatures, numMfccFrames, mfccFrameLength, mfccFrameStride);
+    KwsPreProcess preProcess = KwsPreProcess(inputTensor, numMfccFeatures, numMfccFrames, mfccFrameLength, mfccFrameStride);
+    KwsPostProcess postProcess = KwsPostProcess(outputTensor, classifier, labels, singleInfResult);
 
-    arm::app::KwsPostProcess postProcess =
-        arm::app::KwsPostProcess(outputTensor, classifier, labels, singleInfResult);
-
-    uint32_t file_idx{0};
-    uint32_t inferenceCount{0};
-    std::string lastValidKeywordDetected{};
+    uint32_t file_idx = 0;
+    uint32_t inferenceCount = 0;
+    std::string lastValidKeywordDetected;
 
     while (open_audio_source(file_idx)) {
 
         debug("Using audio data from %s\n", get_audio_name(file_idx));
 
         /* Creating a sliding window through the whole audio clip. */
-        auto audioDataSlider = arm::app::audio::SlidingWindow<const int16_t>(get_audio_array(file_idx),
-                                                                             get_audio_array_size(file_idx),
-                                                                             preProcess.m_audioDataWindowSize,
-                                                                             preProcess.m_audioDataStride);
+        auto audioDataSlider = audio::SlidingWindow<const int16_t>(get_audio_array(file_idx),
+                                                                   get_audio_array_size(file_idx),
+                                                                   preProcess.m_audioDataWindowSize,
+                                                                   preProcess.m_audioDataStride);
         close_audio_source(file_idx++);
 
         /* Reset sliding window position */
@@ -160,7 +153,7 @@ void app_main_thread(void *arg)
             }
 
             /* Add results from this window to our final results vector. */
-            finalResults.emplace_back(arm::app::kws::KwsResult(
+            finalResults.emplace_back(kws::KwsResult(
                 singleInfResult,
                 audioDataSlider.Index() * secondsPerSample * preProcess.m_audioDataStride,
                 audioDataSlider.Index(),
@@ -168,21 +161,16 @@ void app_main_thread(void *arg)
         }
 
         for (const auto& result : finalResults) {
-
-            std::string topKeyword{"<none>"};
-            float score = 0.f;
             if (!result.m_resultVec.empty()) {
-                topKeyword = result.m_resultVec[0].m_label;
-                score      = result.m_resultVec[0].m_normalisedVal;
+                /* Result vector is not empty, get the top result */
+                const auto& topResult = result.m_resultVec[0];
+                const std::string& topKeyword = topResult.m_label;
+                const float score = topResult.m_normalisedVal;
 
-                if (topKeyword != "<none>" && topKeyword != "_unknown_") {
-
-                    if (lastValidKeywordDetected != topKeyword) {
-                        /* Update last keyword. */
-                        lastValidKeywordDetected = topKeyword;
-                        info("Detected: %s; Prob: %0.2f\n", topKeyword.c_str(), score);
-                        std::string dispStr = " Last Keyword: " + topKeyword;
-                    }
+                if (topKeyword != "<none>" && topKeyword != "_unknown_" && topKeyword != lastValidKeywordDetected) {
+                    /* Update last keyword. */
+                    lastValidKeywordDetected = topKeyword;
+                    info("Detected: %s; Prob: %0.2f\n", topKeyword.c_str(), score);
                 }
             }
         }
