@@ -15,7 +15,7 @@
 #  limitations under the License.
 
 solution:
-  created-for: cmsis-toolbox@2.10.0
+  created-for: CMSIS-Toolbox@2.12.0
   cdefault:
 
   select-compiler:
@@ -71,8 +71,6 @@ solution:
   # The target types for hardware targets can be added and layer discovery
   # will be used to find the compatible board layer for the specified device/board.
   target-types:
-    # Reference application target
-    - type: ${Name}
 
     # Arm Corstone-300 targets
     - type: AVH-SSE-300

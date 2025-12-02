@@ -15,10 +15,13 @@
 #  limitations under the License.
 
 solution:
-  created-for: cmsis-toolbox@2.10.0
+  created-for: CMSIS-Toolbox@2.12.0
   cdefault:
 
-  compiler: AC6
+  select-compiler:
+    - compiler: AC6
+    - compiler: GCC
+    - compiler: CLANG
 
   misc:
     - for-compiler: AC6
@@ -61,13 +64,6 @@ solution:
   # The target types for hardware targets can be added and layer discovery
   # will be used to find the compatible board layer for the specified device/board.
   target-types:
-    # Reference application target
-    - type: AE722F80F55D5LS
-      device: AE722F80F55D5LS
-      board: AppKit-E7-AIML:Gen 2
-      variables:
-        - Board-Layer: $SolutionDir()$/Board/AppKit-E7_M55_HE/Board_HE.clayer.yml
-          copied-from: ${CMSIS_PACK_ROOT}/AlifSemiconductor/Ensemble/2.0.0-rc1.29/Boards/AppKit-e7-aiml/Layers/M55_HE/Board_HE.clayer.yml
 
     # Arm Corstone-300 targets
     - type: AVH-SSE-300
@@ -110,7 +106,7 @@ solution:
             model: FVP_Corstone_SSE-300_Ethos-U65
             config: ./board/Corstone-300/fvp_config.txt
             args:
-              - -C mps3_board.v_path=./board/Corstone-300/vsi/python/      
+              - -C mps3_board.v_path=./board/Corstone-300/vsi/python/
 
     # Arm Corstone-310 targets
     - type: AVH-SSE-310
@@ -136,7 +132,7 @@ solution:
         - set:
           debugger:
             name: AVH-FVP
-            model: FVP_Corstone_SSE-310_Ethos
+            model: FVP_Corstone_SSE-310
             config: ./board/Corstone-310/fvp_config.txt
             args:
               - -C mps3_board.v_path=./board/Corstone-310/vsi/python/
@@ -168,7 +164,7 @@ solution:
             model: FVP_Corstone_SSE-315
             config: ./board/Corstone-315/fvp_config.txt
             args:
-              - -C mps3_board.v_path=./board/Corstone-315/vsi/python/
+              - -C mps4_board.v_path=./board/Corstone-315/vsi/python/
 
     - type: AVH-SSE-315-U65
       board: ARM::SSE-315
@@ -182,7 +178,7 @@ solution:
             model: FVP_Corstone_SSE-315
             config: ./board/Corstone-315/fvp_config.txt
             args:
-              - -C mps3_board.v_path=./board/Corstone-315/vsi/python/
+              - -C mps4_board.v_path=./board/Corstone-315/vsi/python/
 
     # Arm Corstone-320 targets
     - type: AVH-SSE-320
@@ -197,7 +193,7 @@ solution:
             model: FVP_Corstone_SSE-320
             config: ./board/Corstone-320/fvp_config.txt
             args:
-              - -C mps3_board.v_path=./board/Corstone-320/vsi/python/
+              - -C mps4_board.v_path=./board/Corstone-320/vsi/python/
 
     - type: AVH-SSE-320-U85
       board: ARM::SSE-320
@@ -211,7 +207,8 @@ solution:
             model: FVP_Corstone_SSE-320
             config: ./board/Corstone-320/fvp_config.txt
             args:
-              - -C mps3_board.v_path=./board/Corstone-320/vsi/python/
+              - -C mps4_board.v_path=./board/Corstone-320/vsi/python/
+
   projects:
-    # Object Detection use case
+    # Generic ML Project
     - project: ./inference_runner/inference_runner.cproject.yml
