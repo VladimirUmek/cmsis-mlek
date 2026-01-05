@@ -1,0 +1,5 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=c:\\GitHub\\VladimirUmek\\cmsis-mlek\\template\\video\\out\\object-detection\\AVH-SSE-300\\Debug-Live_Stream"
+    ]
+}

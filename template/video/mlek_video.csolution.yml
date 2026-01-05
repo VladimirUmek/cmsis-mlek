@@ -78,6 +78,7 @@ solution:
       device: ARM::SSE-300-MPS3
       variables:
         - Board-Layer: ../board/Corstone-300/Board.clayer.yml
+        - ML-Layer: $SolutionDir()$/ML/ml_layer.clayer.yml
       target-set:
         - set:
           debugger:
@@ -86,6 +87,8 @@ solution:
             config: ./board/Corstone-300/fvp_config.txt
             args:
               - -C mps3_board.v_path=./board/Corstone-300/vsi/python/
+          images:
+            - project-context: object-detection.Debug-Live_Stream
 
     - type: AVH-SSE-300-U55
       board: ARM::V2M-MPS3-SSE-300-FVP
@@ -219,3 +222,4 @@ solution:
   projects:
     # Object Detection use case
     - project: ./object-detection/object-detection.cproject.yml
+  compiler: AC6
