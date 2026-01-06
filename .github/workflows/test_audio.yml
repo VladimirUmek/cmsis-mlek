@@ -20,9 +20,10 @@ on:
   workflow_dispatch:
   pull_request:
     paths:
-      - template/audio/**   # Execute workflow when PR modifies template/audio directory
+      - .github/workflows/test_audio.yml  # Execute workflow when PR modifies this file
+      - template/audio/**                 # Execute workflow when PR modifies template/audio directory
   push:
-    branches: [main]        # Execute workflow when main branch is updated
+    branches: [main]                      # Execute workflow when main branch is updated
 
   #schedule:
   #  - cron: '00 20 * * 6'
