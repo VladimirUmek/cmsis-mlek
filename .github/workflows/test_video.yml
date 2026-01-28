@@ -118,7 +118,9 @@ jobs:
     - name: Install PyAudio module
       run: |
         sudo apt-get update
-        sudo apt-get install -y python3-pyaudio
+        # sudo apt-get install -y python3-pyaudio
+        sudo apt-get install portaudio19-dev python3-all-dev
+        pip install pyaudio
 
     - name: Install OpenCV module
       run: |
