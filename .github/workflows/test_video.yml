@@ -115,14 +115,14 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Install system packages
+    - name: Install PyAudio module
       run: |
-        sudo apt install libatomic1 python3.9 python3-pip
+        sudo apt-get update
+        sudo apt-get install -y python3-pyaudio
 
-    - name: Install python modules
+    - name: Install OpenCV module
       run: |
         pip install opencv_python
-        pip install pyaudio
 
     - name: Build Test
       working-directory: ./template/video
