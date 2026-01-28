@@ -18,10 +18,13 @@ name: MLEK video build and execution test
 on:
 
   workflow_dispatch:
-  #pull_request:
-  #  branches: [main]
-  #push:
-  #  branches: [main]
+  pull_request:
+    paths:
+      - .github/workflows/test_video.yml  # Execute workflow when PR modifies this file
+      - template/video/**                 # Execute workflow when PR modifies template/video directory
+  push:
+    branches: [main]                      # Execute workflow when main branch is updated
+
   #schedule:
   #  - cron: '00 20 * * 6'
 
@@ -31,55 +34,55 @@ jobs:
     strategy:
       matrix:
         context: [
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-300,      model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-300-U55,  model: FVP_Corstone_SSE-300_Ethos-U55,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corestone-300,  fvp_cfg: fvp_config.txt,      mps: mps3},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-300-U65,  model: FVP_Corstone_SSE-300_Ethos-U65,  fvp_dir: Corstone-300,  args: '-C mps3_board.v_path=./board/Corstone-300/vsi/python/',  mps: mps3},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-310,      model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-310-U55,  model: FVP_Corstone_SSE-310,            fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corestone-310,  fvp_cfg: fvp_config.txt,      mps: mps3},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-310-U65,  model: FVP_Corstone_SSE-310_Ethos-U65,  fvp_dir: Corstone-310,  args: '-C mps3_board.v_path=./board/Corstone-310/vsi/python/',  mps: mps3},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-315,      model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corestone-315,  fvp_cfg: fvp_config.txt,      mps: mps4},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-315-U65,  model: FVP_Corstone_SSE-315,            fvp_dir: Corstone-315,  args: '-C mps4_board.v_path=./board/Corstone-315/vsi/python/',  mps: mps4},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-320,      model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
 
-          {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4},
-          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corestone-320,  fvp_cfg: fvp_config.txt,      mps: mps4}
+          # {proj: object-detection,  build_type: Release-Live_Stream,  target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
+          # {proj: object-detection,  build_type: Debug-Live_Stream,    target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Release-Data_Array,   target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4},
+          {proj: object-detection,  build_type: Debug-Data_Array,     target_type: AVH-SSE-320-U85,  model: FVP_Corstone_SSE-320,            fvp_dir: Corstone-320,  args: '-C mps4_board.v_path=./board/Corstone-320/vsi/python/',  mps: mps4}
         ]
 
       fail-fast: false
@@ -87,21 +90,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repo
-      uses: actions/checkout@v4
-      with:
-       sparse-checkout: .ci
-
-    - name: Restore Latest Pack Build from Cache
-      uses: actions/cache/restore@v4
-      with:
-         path: ${{ github.workspace }}/output
-         key: latest-cmsis-mlek-pack
-
-    - name: Extract pack content
-      run: |
-        mkdir -p ./ARM/cmsis-mlek/
-        unzip ${{ github.workspace }}/output/ARM.CMSIS-MLEK.*.pack -d ./ARM/cmsis-mlek/
+    - name: Checkout current repository
+      uses: actions/checkout@v6
 
     - name: Install tools
       uses: ARM-software/cmsis-actions/vcpkg@v1
@@ -116,15 +106,43 @@ jobs:
         cpackget init https://www.keil.com/pack/index.pidx
         cpackget update-index
 
-    - name: Cache downloaded packs
-      uses: actions/cache@v4
-      with:
-        key: cmsis-mlek-download
-        path: /home/runner/.cache/arm/packs/.Download
+    - name: Add local CMSIS packs
+      run: |
+        cpackget add ./ARM.CMSIS-MLEK.pdsc
 
-    - name: AC6-Build-Test 4 context ${{matrix.context.proj}}.${{matrix.context.build_type}}+${{matrix.context.target_type}}
-      working-directory: ./ARM/cmsis-mlek/template/video
+    - name: Install python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9'
+
+    - name: AC6-Build-Test for context ${{matrix.context.proj}}.${{matrix.context.build_type}}+${{matrix.context.target_type}}
+      working-directory: ./template/video
       run: |
         cbuild mlek_video.csolution.yml --update-rte --packs --no-schema-check \
         --context ${{matrix.context.proj}}.${{matrix.context.build_type}}+${{matrix.context.target_type}} \
         --toolchain AC6 --rebuild
+
+    - name: AC6-Execution-Test for context ${{matrix.context.proj}}.${{matrix.context.build_type}}+${{matrix.context.target_type}}
+      working-directory: ./template/video
+      run: |
+        ${{ matrix.context.model }} \
+        -a ./out/${{matrix.context.proj}}/${{matrix.context.target_type}}/${{matrix.context.build_type}}/${{matrix.context.proj}}.axf \
+        -f ./board/${{matrix.context.fvp_dir}}/fvp_config.txt \
+        ${{matrix.context.args}} \
+        -C ${{matrix.context.mps}}_board.telnetterminal0.start_telnet=0 \
+        -C ${{matrix.context.mps}}_board.uart0.out_file=fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log \
+        --simlimit 30
+
+    - name: Show and check FVP UART output for fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+      working-directory: ./template/video
+      run: |
+        echo "Show FVP UART output..."
+        cat fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+        echo "Checking FVP UART output..."
+        test "$(grep "FAIL: " fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log | wc -l)" -eq 0
+
+    - name: Upload FVP UART output for ${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+      uses: actions/upload-artifact@v4
+      with:
+        name: fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+        path: ./template/audio/fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
