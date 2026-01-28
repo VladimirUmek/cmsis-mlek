@@ -115,7 +115,11 @@ jobs:
       with:
         python-version: '3.9'
 
-    - name: Install python
+    - name: Install system packages
+      run: |
+        sudo apt install libatomic1 python3.9 python3-pip
+
+    - name: Install python modules
       run: |
         pip install opencv_python
         pip install pyaudio
