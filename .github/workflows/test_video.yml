@@ -115,6 +115,11 @@ jobs:
       with:
         python-version: '3.9'
 
+    - name: Install python
+      run: |
+        pip install opencv_python
+        pip install pyaudio
+
     - name: Build Test
       working-directory: ./template/video
       run: |
