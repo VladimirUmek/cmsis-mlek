@@ -128,9 +128,8 @@ jobs:
         ${{ matrix.context.model }} \
         -a ./out/${{matrix.context.proj}}/${{matrix.context.target_type}}/${{matrix.context.build_type}}/${{matrix.context.proj}}.axf \
         -f ./board/${{matrix.context.fvp_dir}}/fvp_config.txt \
-        ${{matrix.context.args}} \
         -C ${{matrix.context.mps}}_board.telnetterminal0.start_telnet=0 \
-        -C ${{matrix.context.mps}}_board.uart0.out_file=fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log \
+        -C ${{matrix.context.mps}}_board.uart0.out_file=stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}.log \
         -C ${{matrix.context.mps}}_board.v_path=./board/${{matrix.context.fvp_dir}}/vsi/python/ \
         --simlimit 30
 
@@ -138,12 +137,12 @@ jobs:
       working-directory: ./template/video
       run: |
         echo "Show FVP UART output..."
-        cat fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+        cat stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}.log
         echo "Checking FVP UART output..."
-        test "$(grep "FAIL: " fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log | wc -l)" -eq 0
+        test "$(grep "FAIL: " stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}.log | wc -l)" -eq 0
 
-    - name: Upload FVP UART output for ${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+    - name: Upload FVP UART output log
       uses: actions/upload-artifact@v4
       with:
-        name: fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
-        path: ./template/video/fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+        name: stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}.log
+        path: ./template/video/stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}.log
