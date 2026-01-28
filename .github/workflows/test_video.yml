@@ -145,4 +145,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
-        path: ./template/audio/fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
+        path: ./template/video/fvp_stdout_${{matrix.context.build_type}}_${{matrix.context.target_type}}_${{matrix.context.model}}.log
